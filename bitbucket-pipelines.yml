@@ -1,0 +1,67 @@
+pipelines:
+  custom:
+    Build APK -> Upload to Google Drive:
+      - step:
+          name: 📦 Build Finance Quiz App Release APK
+          runs-on:
+            - self.hosted
+            - macos
+          script:
+            - chmod +x ./scripts/build_apk.sh
+            - ./scripts/build_apk.sh
+          artifacts:
+            - build/app/outputs/flutter-apk/*.apk
+            - build/app/outputs/flutter-apk/apk_name.txt
+      - step:
+          name: 🚀 Upload APK to Google Drive
+          script:
+            - chmod +x ./scripts/upload_apk_to_google_drive.sh
+            - ./scripts/upload_apk_to_google_drive.sh
+          artifacts:
+            - build/app/outputs/flutter-apk/*.apk
+
+    Build AAB:
+      - step:
+          name: 📦 Build PetPalete Release AAB
+          runs-on:
+            - self.hosted
+            - macos
+          script:
+            - chmod +x ./scripts/build_aab.sh
+            - ./scripts/build_aab.sh
+          artifacts:
+            - build/app/outputs/bundle/release/*.aab
+            - build/app/outputs/bundle/release/aab_name.txt
+
+    Build IPA:
+      - step:
+          name: 📦 Build iOS IPA
+          runs-on:
+            - self.hosted
+            - macos
+          max-time: 120
+          script:
+            - chmod +x scripts/build_ipa.sh
+            - EXPORT_PLIST="ios/export_options/DevExportOptions.plist" BITBUCKET_BRANCH="$BITBUCKET_BRANCH" ./scripts/build_ipa.sh
+          artifacts:
+            - build/ios/ipa/*.ipa
+
+    Build Dev IPA -> Upload to Google Drive:
+      - step:
+          name: 📦 Build Dev iOS IPA
+          runs-on:
+            - self.hosted
+            - macos
+          max-time: 120
+          script:
+            - chmod +x scripts/build_ipa_for_google_drive.sh
+            - EXPORT_PLIST="ios/export_options/DevExportOptions.plist" BITBUCKET_BRANCH="$BITBUCKET_BRANCH" ENVIRONMENT="dev" ./scripts/build_ipa_for_google_drive.sh
+          artifacts:
+            - build/ios/ipa/*.ipa
+            - build/ios/ipa/ipa_name.txt
+      - step:
+          name: 🚀 Upload IPA to Google Drive
+          max-time: 120
+          script:
+            - chmod +x ./scripts/upload_ipa_to_google_drive.sh
+            - ./scripts/upload_ipa_to_google_drive.sh

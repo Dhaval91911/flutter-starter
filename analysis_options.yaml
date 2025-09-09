@@ -1,0 +1,23 @@
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+
+analyzer:
+  errors:
+    avoid_renaming_method_parameters: ignore
+    no_wildcard_variable_uses: ignore
+    prefer_typing_uninitialized_variables: ignore
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    avoid_print: true
+    avoid_unnecessary_containers: true
+    curly_braces_in_flow_control_structures: true
+    enable_null_safety: true
+    file_names: true
+    prefer_const_declarations: true
+    prefer_single_quotes: true
+    require_trailing_commas: true
+    sort_child_properties_last: true
+    valid_regexps: true
+    void_checks: true
