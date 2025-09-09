@@ -4,7 +4,7 @@ import 'package:starter_template_riverpod/core/theme/extension_theme.dart';
 import 'package:starter_template_riverpod/features/check_version/state_notifier/version_notifier.dart';
 
 import '../../../core/utils/language.dart';
-import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/common_text_field.dart';
 import '../../../route_config/route_config.dart';
 import '../../../route_config/routes.dart';
 
@@ -41,10 +41,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 16),
             ElevatedButton(onPressed: () => AppRouter.router.push(Routes.user), child: Text(Languages.goToUser)),
             const SizedBox(height: 16),
+            ElevatedButton(onPressed: () => AppRouter.router.push(Routes.signup), child: const Text('Sign Up')),
+            const SizedBox(height: 16),
             Container(color: ref.backGround, height: 50, width: 50),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: CustomTextField(
+              child: CommonTextField(
                 controller: TextEditingController(),
                 labelText: 'Enter something',
                 hintText: 'Type here...',

@@ -15,7 +15,6 @@
 //   @override
 //   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
 //     final token = isNewToken.value ? getIt<StorageService>().get(createNewUserToken) : getIt<StorageService>().get(userToken);
-//     print("token -=-=-=-=-=-= splash -=-=-=-=  $token");
 //     if (token != null) {
 //       options.headers['Authorization'] = 'Bearer $token';
 //     }
@@ -40,7 +39,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:starter_template_riverpod/core/shared_pref/shared_pref.dart';
 
 import '../../injectable/injectable.dart';
@@ -61,7 +59,6 @@ class TokenInterceptor implements Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final token = getIt<SharedPrefService>().getString('userToken');
-    debugPrint('token -=-=-=-=-=-= splash -=-=-=-  $token');
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
     }

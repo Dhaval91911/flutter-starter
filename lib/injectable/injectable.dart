@@ -9,7 +9,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starter_template_riverpod/injectable/injectable.config.dart';
@@ -37,21 +36,14 @@ Future<void> configuration({required void Function() runApp}) async {
       // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
       AppNotificationHandler();
       AppNotificationHandler.initialize();
-      getIt<Dio>().interceptors.add(PrettyDioLogger(responseBody: false));
+      // Enable verbose request/response logging (URL + headers + bodies)
+      getIt<Dio>().interceptors.add(
+        PrettyDioLogger(requestHeader: true, requestBody: true, responseHeader: false, responseBody: true, error: true, compact: true),
+      );
       getIt<Dio>().interceptors.add(TokenInterceptor());
       getIt<Dio>().interceptors.add(ConnectivityInterceptor());
 
-      await Permission.notification.isDenied.then((value) {
-        if (value) {
-          Permission.notification.request();
-        }
-      });
-
-      await Permission.location.isDenied.then((value) {
-        if (value) {
-          Permission.location.request();
-        }
-      });
+      // Defer runtime permissions (e.g., notification) to after splash
 
       configLoading();
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -83,8 +75,10 @@ abstract class RegisterModule {
   @singleton
   Dio dio() => Dio();
 
+  @Named('baseUrl')
   String get baseUrl => env.EnvironmentConfig.baseUrl;
 
+  @Named('socketBaseUrl')
   String get socketBaseUrl => env.EnvironmentConfig.socketBaseUrl;
 
   @preResolve

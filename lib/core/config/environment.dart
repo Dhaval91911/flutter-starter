@@ -9,11 +9,11 @@ class EnvironmentConfig {
   static String get baseUrl {
     switch (_environment) {
       case Environment.dev:
-        return 'https://dummyjson.com';
+        return 'http://192.168.29.59:3000';
       case Environment.staging:
-        return 'https://your-staging-url.com';
+        return 'http://192.168.29.59:3000';
       case Environment.production:
-        return 'https://your-production-url.com';
+        return 'http://192.168.29.59:3000';
     }
   }
 

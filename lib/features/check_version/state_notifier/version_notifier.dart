@@ -21,7 +21,7 @@ class VersionNotifier extends StateNotifier<AsyncValue<CheckAppVersionModel>> {
     try {
       state = const AsyncValue.loading();
 
-      final body = CheckVersionRequest(appVersion: '1.0.0', appPlatform: 'Android', deviceToken: 'deviceToken', selectedLanguage: 'ln');
+      final body = CheckVersionRequest(appVersion: '1.0.0', appPlatform: 'android', selectedLanguage: 'en');
 
       final data = await apiService.checkVersion(body);
       state = AsyncValue.data(data);

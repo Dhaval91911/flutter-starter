@@ -1,9 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart' as i;
+import 'package:injectable/injectable.dart';
 import 'package:retrofit/error_logger.dart';
 import 'package:retrofit/http.dart';
 
+import '../../features/auth/model/signup_request_model.dart';
+import '../../features/auth/model/signup_response_model.dart';
 import '../../features/check_version/model/check_version_model.dart';
 import '../../features/check_version/model/check_version_req_model.dart';
 import '../../features/pagination/model/user_model.dart';
@@ -16,21 +19,19 @@ part 'api_service.g.dart';
 @i.injectable
 abstract class ApiService {
   @i.factoryMethod
-  factory ApiService(Dio dio, {String baseUrl}) = _ApiService;
+  factory ApiService(Dio dio, @Named('baseUrl') String baseUrl) => _ApiService(dio, baseUrl: baseUrl);
 
-  @POST('/app_version/update_app_version')
-  Future<CheckAppVersionModel> checkVersion(
-    @Body() CheckVersionRequest request,
-  );
+  @POST('/v1/app/appVersion/app_version_check')
+  Future<CheckAppVersionModel> checkVersion(@Body() CheckVersionRequest request);
 
   @GET('/users')
   Future<PeopleListModel> getPeoples();
 
   @GET('/users')
-  Future<UserListModel> getUsers(
-    @Query('limit') int limit,
-    @Query('skip') int skip,
-  );
+  Future<UserListModel> getUsers(@Query('limit') int limit, @Query('skip') int skip);
+
+  @POST('/v1/app/user/sign_up')
+  Future<SignupResponseModel> signUp(@Body() SignupRequestModel request);
 
   // @POST("/user/add_support")
   // Future<DefaultResponseModel> addSupport(@Body() request);

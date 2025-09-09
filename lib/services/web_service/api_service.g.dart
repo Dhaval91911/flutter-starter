@@ -30,7 +30,7 @@ class _ApiService implements ApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/app_version/update_app_version',
+            '/v1/app/appVersion/app_version_check',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -94,6 +94,34 @@ class _ApiService implements ApiService {
     late UserListModel _value;
     try {
       _value = await compute(deserializeUserListModel, _result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<SignupResponseModel> signUp(SignupRequestModel request) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(await compute(serializeSignupRequestModel, request));
+    final _options = _setStreamType<SignupResponseModel>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/v1/app/user/sign_up',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late SignupResponseModel _value;
+    try {
+      _value = await compute(deserializeSignupResponseModel, _result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
