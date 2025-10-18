@@ -20,7 +20,7 @@ class Validators {
 
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return 'Please enter your password';
     }
 
     if (value.length < AppConfig.minPasswordLength) {
@@ -31,15 +31,59 @@ class Validators {
       return 'Password is too long';
     }
 
-    // Check for at least one uppercase letter, one lowercase letter, and one number
+    // Check for at least one uppercase letter, one lowercase letter, one number, and one special character
     final hasUppercase = value.contains(RegExp(r'[A-Z]'));
     final hasLowercase = value.contains(RegExp(r'[a-z]'));
     final hasNumbers = value.contains(RegExp(r'[0-9]'));
+    final hasSpecialChar = value.contains(RegExp(r'[^A-Za-z0-9]'));
 
-    if (!hasUppercase || !hasLowercase || !hasNumbers) {
-      return 'Password must contain uppercase, lowercase, and numbers';
+    if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSpecialChar) {
+      return 'Password must contain uppercase, lowercase, number, and special character';
     }
 
+    return null;
+  }
+
+  static String? validateNewPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a new password';
+    }
+
+    if (value.length < AppConfig.minPasswordLength) {
+      return 'Password must be at least ${AppConfig.minPasswordLength} characters';
+    }
+
+    if (value.length > AppConfig.maxPasswordLength) {
+      return 'Password is too long';
+    }
+
+    // Check for at least one uppercase letter, one lowercase letter, one number, and one special character
+    final hasUppercase = value.contains(RegExp(r'[A-Z]'));
+    final hasLowercase = value.contains(RegExp(r'[a-z]'));
+    final hasNumbers = value.contains(RegExp(r'[0-9]'));
+    final hasSpecialChar = value.contains(RegExp(r'[^A-Za-z0-9]'));
+
+    if (!hasUppercase || !hasLowercase || !hasNumbers || !hasSpecialChar) {
+      return 'Password must contain uppercase, lowercase, number, and special character';
+    }
+
+    return null;
+  }
+
+  static String? validateCurrentPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your current password';
+    }
+    return null;
+  }
+
+  static String? validateConfirmPassword(String? value, String? originalPassword) {
+    if (value == null || value.isEmpty) {
+      return 'Please confirm your password';
+    }
+    if (value != originalPassword) {
+      return 'Passwords do not match';
+    }
     return null;
   }
 

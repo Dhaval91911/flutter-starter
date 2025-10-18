@@ -15,4 +15,7 @@
     <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+
+    <!-- Theme for UCropActivity must extend AppCompat (night) -->
+    <style name="Ucrop.CropTheme" parent="Theme.AppCompat.DayNight.NoActionBar" />
 </resources>

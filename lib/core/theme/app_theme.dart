@@ -7,11 +7,7 @@ class AppThemes {
     brightness: Brightness.light,
     primarySwatch: Colors.blue,
     primaryColor: Colors.blue,
-    scaffoldBackgroundColor: Colors.white,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.blue,
-      foregroundColor: Colors.white,
-    ),
+    appBarTheme: const AppBarTheme(backgroundColor: Colors.blue, foregroundColor: Colors.white),
     extensions: [
       CustomThemeColor(
         shimmerBaseColor: Colors.grey,
@@ -31,11 +27,7 @@ class AppThemes {
     brightness: Brightness.dark,
     primarySwatch: Colors.deepPurple,
     primaryColor: Colors.deepPurple,
-    scaffoldBackgroundColor: Colors.black,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.black,
-      foregroundColor: Colors.white,
-    ),
+    appBarTheme: const AppBarTheme(backgroundColor: Colors.black, foregroundColor: Colors.white),
     extensions: [
       CustomThemeColor(
         shimmerBaseColor: Colors.grey,

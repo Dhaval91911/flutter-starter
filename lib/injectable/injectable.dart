@@ -3,19 +3,23 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starter_template_riverpod/injectable/injectable.config.dart';
 
 import '../core/config/environment.dart' as env;
+import '../core/config/app_config.dart';
 import '../core/notification_helper/notification_helper.dart';
+import '../services/permissions/notification_permission_service.dart';
+import '../firebase_options.dart';
 import '../route_config/route_config.dart';
 import '../services/connectivity_interceptor/connectivity_interceptor.dart';
 import '../services/http_interceptor/http_interceptor.dart';
@@ -34,29 +38,39 @@ Future<void> configuration({required void Function() runApp}) async {
       AppRouter.init();
       await getIt.init();
       await EasyLocalization.ensureInitialized();
-      // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-      AppNotificationHandler();
-      AppNotificationHandler.initialize();
-      getIt<Dio>().interceptors.add(PrettyDioLogger(responseBody: false));
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      // Defer notification setup until user grants consent
+      final granted = await const NotificationPermissionService().ensureAndIsGranted();
+      if (granted) {
+        AppNotificationHandler();
+        AppNotificationHandler.initialize();
+      }
+      // Enable verbose request/response logging (URL + headers + bodies)
+      if (env.EnvironmentConfig.isDevelopment || env.EnvironmentConfig.isStaging) {
+        getIt<Dio>().interceptors.add(
+          PrettyDioLogger(requestHeader: true, requestBody: true, responseHeader: false, responseBody: true, error: true, compact: true),
+        );
+      }
       getIt<Dio>().interceptors.add(TokenInterceptor());
       getIt<Dio>().interceptors.add(ConnectivityInterceptor());
+      getIt<Dio>().interceptors.add(
+        RetryInterceptor(
+          dio: getIt<Dio>(),
+          maxRetries: AppConfig.maxRetries,
+          initialBackoff: AppConfig.initialBackoff,
+          backoffMultiplier: AppConfig.backoffMultiplier,
+          maxBackoff: AppConfig.maxBackoff,
+        ),
+      );
 
-      await Permission.notification.isDenied.then((value) {
-        if (value) {
-          Permission.notification.request();
-        }
-      });
-
-      await Permission.location.isDenied.then((value) {
-        if (value) {
-          Permission.location.request();
-        }
-      });
+      // Defer runtime permissions (e.g., notification) to after splash
 
       configLoading();
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-      HttpOverrides.global = MyHttpOverrides();
+      if (!kReleaseMode) {
+        HttpOverrides.global = MyHttpOverrides();
+      }
       // FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance; // Change here
 
       // await firebaseMessaging.getToken().then((token) {
@@ -81,10 +95,21 @@ Future<void> configuration({required void Function() runApp}) async {
 @module
 abstract class RegisterModule {
   @singleton
-  Dio dio() => Dio();
+  Dio dio() {
+    final options = BaseOptions(
+      baseUrl: AppConfig.apiBaseUrl,
+      connectTimeout: AppConfig.connectTimeout,
+      sendTimeout: AppConfig.sendTimeout,
+      receiveTimeout: AppConfig.receiveTimeout,
+      validateStatus: (status) => status != null && status >= 200 && status < 600,
+    );
+    return Dio(options);
+  }
 
+  @Named('baseUrl')
   String get baseUrl => env.EnvironmentConfig.baseUrl;
 
+  @Named('socketBaseUrl')
   String get socketBaseUrl => env.EnvironmentConfig.socketBaseUrl;
 
   @preResolve
@@ -111,9 +136,9 @@ class MyHttpOverrides extends HttpOverrides {
 void configLoading() {
   EasyLoading.instance
     ..indicatorType = EasyLoadingIndicatorType.circle
-    ..loadingStyle = EasyLoadingStyle.dark
+    ..loadingStyle = EasyLoadingStyle.custom
     ..userInteractions = false
     ..dismissOnTap = false
-    ..maskType = EasyLoadingMaskType.black
+    ..maskType = EasyLoadingMaskType.custom
     ..animationStyle = EasyLoadingAnimationStyle.offset;
 }

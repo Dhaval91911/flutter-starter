@@ -1,4 +1,4 @@
-package com.example.starter_template_riverpod
+package com.riverpodStructure
 
 import io.flutter.embedding.android.FlutterActivity
 

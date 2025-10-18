@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ConnectivityInterceptor implements Interceptor {
   @override
@@ -10,28 +9,23 @@ class ConnectivityInterceptor implements Interceptor {
 
   @override
   void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    // Check for internet connection
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        // Internet connection is available, proceed with the request
-        handler.next(options);
-      }
-    } on SocketException catch (_) {
-      // Fluttertoast.showToast(msg: 'No Internet Connection');
-      // Loader.hide();
-      handler.reject(
-        DioException(
-          requestOptions: options,
-          error: 'No Internet Connection',
-          type: DioExceptionType.cancel,
-        ),
-        true,
-      );
+      RequestOptions options,
+      RequestInterceptorHandler handler,
+      ) async {
+    final hasInternet = await InternetConnection().hasInternetAccess;
+    if (hasInternet) {
+      handler.next(options);
+      return;
     }
+
+    handler.reject(
+      DioException(
+        requestOptions: options,
+        error: 'No Internet Connection',
+        type: DioExceptionType.connectionError,
+      ),
+      true,
+    );
   }
 
   @override

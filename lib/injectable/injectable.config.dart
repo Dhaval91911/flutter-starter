@@ -16,6 +16,8 @@ import 'package:package_info_plus/package_info_plus.dart' as _i655;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:starter_template_riverpod/core/shared_pref/shared_pref.dart'
     as _i628;
+import 'package:starter_template_riverpod/features/auth/state_notifier/auth_notifier.dart'
+    as _i1055;
 import 'package:starter_template_riverpod/features/check_version/state_notifier/version_notifier.dart'
     as _i462;
 import 'package:starter_template_riverpod/features/pagination/state_notifier/user_notifier.dart'
@@ -34,7 +36,6 @@ extension GetItInjectableX on _i174.GetIt {
   }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
-    gh.factory<String>(() => registerModule.baseUrl);
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => registerModule.prefs(),
       preResolve: true,
@@ -47,11 +48,22 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i628.SharedPrefService>(
       () => _i628.SharedPrefService(pref: gh<_i460.SharedPreferences>()),
     );
+    gh.factory<String>(
+      () => registerModule.socketBaseUrl,
+      instanceName: 'socketBaseUrl',
+    );
+    gh.factory<String>(() => registerModule.baseUrl, instanceName: 'baseUrl');
     gh.lazySingleton<_i33.ApiService>(
-      () => _i33.ApiService.new(gh<_i361.Dio>(), baseUrl: gh<String>()),
+      () => _i33.ApiService.new(
+        gh<_i361.Dio>(),
+        gh<String>(instanceName: 'baseUrl'),
+      ),
     );
     gh.factory<_i385.UserNotifier>(
       () => _i385.UserNotifier(gh<_i33.ApiService>()),
+    );
+    gh.factory<_i1055.AuthNotifier>(
+      () => _i1055.AuthNotifier(gh<_i33.ApiService>()),
     );
     gh.factory<_i1013.PeopleNotifier>(
       () => _i1013.PeopleNotifier(gh<_i33.ApiService>()),

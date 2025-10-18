@@ -7,7 +7,8 @@ import 'package:oktoast/oktoast.dart';
 
 import 'core/theme/app_theme_mode_provider.dart';
 import 'core/utils/provider_observer.dart';
-import 'features/network/state_notifier/network_notifier.dart';
+import 'core/widgets/keyboard_dismissible.dart';
+import 'features/network/notifier/network_notifier.dart';
 import 'injectable/injectable.dart';
 import 'route_config/route_config.dart';
 
@@ -55,16 +56,18 @@ class _MyAppState extends ConsumerState<MyApp> {
       splitScreenMode: true,
       builder: (context, child) {
         return OKToast(
-          child: MaterialApp.router(
-            builder: EasyLoading.init(),
-            themeMode: themeMode.mode,
-            theme: themeMode.lightTheme,
-            darkTheme: themeMode.darkTheme,
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            routerConfig: AppRouter.router,
-            debugShowCheckedModeBanner: false,
+          child: KeyboardDismissible(
+            child: MaterialApp.router(
+              builder: EasyLoading.init(),
+              themeMode: themeMode.mode,
+              theme: themeMode.lightTheme,
+              darkTheme: themeMode.darkTheme,
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+              routerConfig: AppRouter.router,
+              debugShowCheckedModeBanner: false,
+            ),
           ),
         );
       },

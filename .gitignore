@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# FVM Version Cache
+.fvm/
+
+# Credentials Files
+firebase.json
+lib/firebase_options.dart
+lib/core/config/environment.dart
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+scripts/upload_*.sh
